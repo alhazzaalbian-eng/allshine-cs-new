@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALLSHINE - Manajemen Cuci Sepatu</title>
-    <!-- Pengaturan PWA agar bisa diinstal di HP -->
+    <!-- PWP Manifest dengan Logo Custom Asli -->
     <meta name="theme-color" content="#4f46e5">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ALLSHINE%22%2C%22short_name%22%3A%22ALLSHINE%22%2C%22start_url%22%3A%2522%2F%2522%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%234f46e5%22%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ALLSHINE%20POS%22%2C%22short_name%22%3A%22ALLSHINE%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%234f46e5%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo.png.jpeg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpeg%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -45,7 +45,7 @@
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="input-pin" placeholder="PIN (Default: 1234)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-lg font-bold text-white focus:outline-none focus:border-indigo-500">
+                    <input type="password" id="input-pin" placeholder="PIN (Default: 310504)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-lg font-bold text-white focus:outline-none focus:border-indigo-500">
                     <p id="login-error" class="text-xs text-rose-400 mt-2 hidden">PIN salah! Coba lagi.</p>
                 </div>
                 <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
@@ -430,7 +430,7 @@
 
     <!-- SCRIPT -->
     <script>
-        var KASIR_PIN = "1234"; 
+        var KASIR_PIN = ""; 
 
         function handleLogin(e) {
             e.preventDefault();
