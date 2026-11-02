@@ -45,7 +45,7 @@
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="input-pin" placeholder="PIN (Default: 310504)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-lg font-bold text-white focus:outline-none focus:border-indigo-500">
+                    <input type="password" id="input-pin" placeholder="PIN (Default: 1234)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-lg font-bold text-white focus:outline-none focus:border-indigo-500">
                     <p id="login-error" class="text-xs text-rose-400 mt-2 hidden">PIN salah! Coba lagi.</p>
                 </div>
                 <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
@@ -430,7 +430,7 @@
 
     <!-- SCRIPT -->
     <script>
-        var KASIR_PIN = "310504"; 
+        var KASIR_PIN = "1234"; 
 
         function handleLogin(e) {
             e.preventDefault();
