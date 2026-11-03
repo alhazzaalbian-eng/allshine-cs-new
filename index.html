@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALLSHINE - Manajemen Cuci Sepatu</title>
-    <!-- Perbaikan jalur PWA Manifest agar tidak 404 saat dibuka dari Home Screen -->
     <meta name="theme-color" content="#4f46e5">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22ALLSHINE%20POS%22%2C%22short_name%22%3A%22ALLSHINE%22%2C%22start_url%22%3A%22.%2Findex.html%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%234f46e5%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo.png.jpeg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpeg%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     
@@ -33,26 +32,40 @@
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
-    <!-- SCREEN LOGIN PIN LOKAL -->
+    <!-- SCREEN LOGIN & CEK STATUS PUBLIK -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-sm w-full text-center space-y-6 shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center space-y-6 shadow-2xl">
             <div class="inline-flex bg-indigo-600 p-4 rounded-2xl text-white shadow-xl shadow-indigo-600/30">
-                <i data-lucide="lock" class="w-8 h-8"></i>
+                <i data-lucide="sparkles" class="w-8 h-8"></i>
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-white tracking-tight">ALL<span class="text-indigo-400">SHINE</span></h1>
-                <p class="text-xs text-slate-400 mt-1">Masukkan PIN Kasir untuk Membuka Aplikasi</p>
+                <p class="text-xs text-slate-400 mt-1">Professional Shoe Care System</p>
             </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
+
+            <!-- PIN LOGIN FORM -->
+            <form onsubmit="handleLogin(event)" class="space-y-3">
                 <div>
-                    <input type="password" id="input-pin" placeholder="PIN (Default: 1234)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-lg font-bold text-white focus:outline-none focus:border-indigo-500">
-                    <p id="login-error" class="text-xs text-rose-400 mt-2 hidden">PIN salah! Coba lagi.</p>
+                    <input type="password" id="input-pin" placeholder="PIN Kasir (Default: 1234)" maxlength="6" required class="w-full text-center tracking-widest bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white focus:outline-none focus:border-indigo-500">
+                    <p id="login-error" class="text-xs text-rose-400 mt-1 hidden">PIN salah! Coba lagi.</p>
                 </div>
                 <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <i data-lucide="log-in" class="w-4 h-4"></i> Masuk Sistem
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Masuk Sistem Kasir
                 </button>
             </form>
-            <p class="text-[11px] text-slate-500">ALLSHINE PWA Mobile Ready</p>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-medium">atau Pelanggan?</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <!-- PUBLIC TRACKING BUTTON -->
+            <button onclick="bukaModalCekStatus()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-300 rounded-xl font-medium text-xs transition-all flex items-center justify-center gap-2">
+                <i data-lucide="search" class="w-4 h-4"></i> Cek Status Cuci Sepatu
+            </button>
+
+            <p class="text-[10px] text-slate-600">ALLSHINE PWA Mobile Ready</p>
         </div>
     </div>
 
@@ -201,8 +214,8 @@
                             <th class="p-3">Total Biaya</th>
                             <th class="p-3">Pengerjaan</th>
                             <th class="p-3">Pembayaran</th>
-                            <th class="p-3 text-center">Aksi WA</th>
-                            <th class="p-3 text-center">Cetak Nota</th>
+                            <th class="p-3 text-center">Aksi WA & Nota</th>
+                            <th class="p-3 text-center">Kelola</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-all-orders" class="divide-y divide-slate-700/40"></tbody>
@@ -283,6 +296,30 @@
 
     </main>
 
+    <!-- MODAL CEK STATUS (PUBLIC / TRACKING) -->
+    <div id="modalCekStatus" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl border border-slate-800 max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+            <div class="text-center space-y-1">
+                <div class="inline-flex bg-indigo-600/20 text-indigo-400 p-3 rounded-2xl mb-2">
+                    <i data-lucide="package-check" class="w-7 h-7"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Cek Status Cuci Sepatu</h3>
+                <p class="text-xs text-slate-400">Masukkan Kode Order unik kamu di bawah ini</p>
+            </div>
+
+            <div class="flex gap-2">
+                <input type="text" id="input-search-id" placeholder="Contoh: ASH-123456" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white tracking-wider focus:outline-none focus:border-indigo-500 uppercase">
+                <button onclick="prosesCekStatusManual()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all">Cek</button>
+            </div>
+
+            <div id="result-status-area" class="hidden bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 space-y-3">
+                <!-- DYNAMIC RESULT HERE -->
+            </div>
+
+            <button onclick="tutupModalCekStatus()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all">Tutup</button>
+        </div>
+    </div>
+
     <!-- MODAL SYNC / PASTE DATA -->
     <div id="modalSync" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl border border-slate-700 max-w-lg w-full p-6 space-y-4">
@@ -296,11 +333,12 @@
         </div>
     </div>
 
-    <!-- MODAL PESANAN -->
+    <!-- MODAL PESANAN (TAMBAH / EDIT) -->
     <div id="modalPesanan" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 rounded-2xl border border-slate-700 max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-bold text-white">Tambah Pesanan Baru</h3>
+            <h3 id="modalPesananTitle" class="text-lg font-bold text-white">Tambah Pesanan Baru</h3>
             <form id="formPesanan" class="space-y-3">
+                <input type="hidden" id="p-edit-id">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Nama Pelanggan</label>
                     <input type="text" id="p-nama" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white">
@@ -338,7 +376,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-2">Jumlah Qty Layanan:</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-2">Pilihan Layanan (Qty):</label>
                     <div id="p-layanan-qty-list" class="space-y-2 bg-slate-900 border border-slate-700 rounded-xl p-3 max-h-40 overflow-y-auto"></div>
                 </div>
                 <div>
@@ -352,7 +390,7 @@
                 </div>
                 <div class="flex gap-2 pt-2">
                     <button type="button" onclick="closeModalPesanan()" class="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm">Batal</button>
-                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan</button>
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Simpan Pesanan</button>
                 </div>
             </form>
         </div>
@@ -585,17 +623,21 @@
                 var tglSelesaiText = p.tglSelesai ? '<br><span class="text-xs text-indigo-300">📅 Selesai: ' + p.tglSelesai + '</span>' : '';
                 
                 var grandTotal = p.tarif + (p.ongkir || 0);
-                var urlWA = 'https://api.whatsapp.com/send?phone=' + formatHP(p.hp) + '&text=' + encodeURIComponent('Halo Kak *' + p.nama + '*,\nSepatu kamu (*' + p.sepatu + '*) di *ALLSHINE* statusnya: *' + p.status + '*.\nEstimasi Selesai: *' + (p.tglSelesai || '-') + '*\nTotal: *' + formatRp(grandTotal) + '* (' + currentBayar + ').');
+                
+                // LINK TRACKING OTOMATIS
+                var trackingUrl = window.location.origin + window.location.pathname + '#cek=' + p.id;
+                var textWA = 'Halo Kak *' + p.nama + '*,\n\nSepatu kamu (*' + p.sepatu + '*) di *ALLSHINE* statusnya saat ini: *' + p.status + '*.\n\n📅 Estimasi Selesai: *' + (p.tglSelesai || '-') + '*\n💰 Total Biaya: *' + formatRp(grandTotal) + '* (' + currentBayar + ')\n\n🔍 *Cek Progres Sepatu Real-Time di sini:*\n' + trackingUrl + '\n\nTerima kasih telah mencuci sepatu di ALLSHINE!';
+                var urlWA = 'https://api.whatsapp.com/send?phone=' + formatHP(p.hp) + '&text=' + encodeURIComponent(textWA);
 
                 tbody.innerHTML += 
                     '<tr>' +
-                        '<td class="p-3 font-mono text-xs text-indigo-400">' + p.id + '</td>' +
+                        '<td class="p-3 font-mono text-xs text-indigo-400 font-bold">' + p.id + '</td>' +
                         '<td class="p-3 font-semibold">' + p.nama + '<br><span class="text-xs text-slate-500">' + p.hp + '</span></td>' +
                         '<td class="p-3 text-slate-300">' + p.sepatu + minusText + metodeBadge + '</td>' +
                         '<td class="p-3 text-slate-300">' + p.layananNama + tglSelesaiText + '</td>' +
-                        '<td class="p-3 font-medium">' + formatRp(grandTotal) + '</td>' +
+                        '<td class="p-3 font-medium text-emerald-400">' + formatRp(grandTotal) + '</td>' +
                         '<td class="p-3">' +
-                            '<select onchange="updateStatusPesanan(\'' + p.id + '\', \'status\', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg p-1.5 text-slate-300">' +
+                            '<select onchange="updateStatusPesanan(\'' + p.id + '\', \'status\', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg p-1.5 text-slate-300 font-medium">' +
                                 '<option value="Antrian" ' + (p.status === 'Antrian' ? 'selected' : '') + '>Antrian</option>' +
                                 '<option value="Proses Cuci" ' + (p.status === 'Proses Cuci' ? 'selected' : '') + '>Proses Cuci</option>' +
                                 '<option value="Selesai" ' + (p.status === 'Selesai' ? 'selected' : '') + '>Selesai</option>' +
@@ -603,18 +645,20 @@
                             '</select>' +
                         '</td>' +
                         '<td class="p-3">' +
-                            '<select onchange="updateStatusPesanan(\'' + p.id + '\', \'bayar\', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg p-1.5 text-indigo-300">' +
+                            '<select onchange="updateStatusPesanan(\'' + p.id + '\', \'bayar\', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg p-1.5 text-indigo-300 font-medium">' +
                                 '<option value="Belum Bayar" ' + (currentBayar === 'Belum Bayar' ? 'selected' : '') + '>Belum Bayar</option>' +
                                 '<option value="Lunas - Cash" ' + (currentBayar.includes('Cash') || currentBayar === 'Lunas' ? 'selected' : '') + '>Lunas - Cash</option>' +
                                 '<option value="Lunas - Transfer" ' + (currentBayar.includes('Transfer') ? 'selected' : '') + '>Lunas - Transfer</option>' +
                                 '<option value="Lunas - QRIS" ' + (currentBayar.includes('QRIS') ? 'selected' : '') + '>Lunas - QRIS</option>' +
                             '</select>' +
                         '</td>' +
-                        '<td class="p-3 text-center">' +
-                            '<a href="' + urlWA + '" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600/20 text-emerald-400 px-2.5 py-1 rounded-lg text-xs font-medium">Kirim WA</a>' +
+                        '<td class="p-3 text-center space-y-1">' +
+                            '<a href="' + urlWA + '" target="_blank" class="block w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 px-2 py-1 rounded-lg text-xs font-semibold">📱 Kirim WA</a>' +
+                            '<button onclick="cetakNota(\'' + p.id + '\')" class="block w-full bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-1 rounded-lg text-xs font-medium">🖨️ Struk</button>' +
                         '</td>' +
-                        '<td class="p-3 text-center">' +
-                            '<button onclick="cetakNota(\'' + p.id + '\')" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-medium">🖨️ Struk</button>' +
+                        '<td class="p-3 text-center space-x-1">' +
+                            '<button onclick="bukaEditPesanan(\'' + p.id + '\')" title="Edit Pesanan" class="p-1.5 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 rounded-lg text-xs">✏️</button>' +
+                            '<button onclick="hapusPesanan(\'' + p.id + '\')" title="Hapus Pesanan" class="p-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-lg text-xs">🗑️</button>' +
                         '</td>' +
                     '</tr>';
             }
@@ -646,9 +690,9 @@
                     '</tr>';
 
                 qtyContainer.innerHTML += 
-                    '<div class="flex items-center justify-between py-1.5">' +
-                        '<span class="text-sm text-slate-200">' + l.nama + ' (' + formatRp(l.tarif) + ')</span>' +
-                        '<input type="number" min="0" value="0" data-layanan-id="' + l.id + '" class="input-qty-layanan w-16 bg-slate-800 border border-slate-700 text-center rounded-lg py-1 text-sm text-white font-semibold">' +
+                    '<div class="flex items-center justify-between py-1.5 border-b border-slate-800 last:border-none">' +
+                        '<span class="text-xs text-slate-200 font-medium">' + l.nama + ' (' + formatRp(l.tarif) + ')</span>' +
+                        '<input type="number" min="0" value="0" data-layanan-id="' + l.id + '" class="input-qty-layanan w-16 bg-slate-800 border border-slate-700 text-center rounded-lg py-1 text-xs text-white font-bold focus:border-indigo-500">' +
                     '</div>';
             }
         }
@@ -734,6 +778,96 @@
             }
         }
 
+        // FITUR EDIT & HAPUS PESANAN
+        function bukaEditPesanan(id) {
+            var p = state.pesanan.find(function(item) { return item.id === id; });
+            if (!p) return;
+
+            document.getElementById('p-edit-id').value = p.id;
+            document.getElementById('p-nama').value = p.nama;
+            document.getElementById('p-hp').value = p.hp;
+            document.getElementById('p-sepatu').value = p.sepatu;
+            document.getElementById('p-minus').value = p.minus || '';
+            document.getElementById('p-metode').value = p.metode || 'Drop di Toko';
+            document.getElementById('p-ongkir').value = p.ongkir || 0;
+            document.getElementById('p-bayar').value = p.bayar || 'Belum Bayar';
+
+            toggleOngkirInput();
+            document.getElementById('modalPesananTitle').innerText = 'Edit Pesanan (' + p.id + ')';
+            openModalPesanan();
+        }
+
+        function hapusPesanan(id) {
+            if (confirm('Apakah kamu yakin ingin menghapus pesanan ' + id + '? Data yang dihapus tidak bisa dikembalikan.')) {
+                state.pesanan = state.pesanan.filter(function(p) { return p.id !== id; });
+                saveData();
+            }
+        }
+
+        // FITUR PUBLIC CEK STATUS / TRACKING
+        function bukaModalCekStatus() {
+            document.getElementById('modalCekStatus').classList.remove('hidden');
+        }
+        function tutupModalCekStatus() {
+            document.getElementById('modalCekStatus').classList.add('hidden');
+            document.getElementById('result-status-area').classList.add('hidden');
+            document.getElementById('input-search-id').value = '';
+        }
+
+        function prosesCekStatusManual() {
+            var searchId = document.getElementById('input-search-id').value.trim().toUpperCase();
+            if (!searchId) { alert('Masukkan Kode Order!'); return; }
+            tampilkanDetailTracking(searchId);
+        }
+
+        function tampilkanDetailTracking(orderId) {
+            var p = state.pesanan.find(function(item) { return item.id.toUpperCase() === orderId.toUpperCase(); });
+            var resultArea = document.getElementById('result-status-area');
+            resultArea.classList.remove('hidden');
+
+            if (!p) {
+                resultArea.innerHTML = 
+                    '<div class="text-center py-3 text-rose-400 font-semibold text-xs">' +
+                        '❌ Pesanan dengan ID <b>' + orderId + '</b> tidak ditemukan.<br><span class="text-slate-400 font-normal">Pastikan penulisan ID sudah benar.</span>' +
+                    '</div>';
+                return;
+            }
+
+            var grandTotal = p.tarif + (p.ongkir || 0);
+            var statusBadgeColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+            if (p.status === 'Proses Cuci') statusBadgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+            if (p.status === 'Selesai') statusBadgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+
+            resultArea.innerHTML = 
+                '<div class="space-y-2 text-xs">' +
+                    '<div class="flex justify-between items-center pb-2 border-b border-slate-700/80">' +
+                        '<div>' +
+                            '<span class="font-mono font-bold text-indigo-400 text-sm">' + p.id + '</span>' +
+                            '<p class="text-[11px] text-slate-300 font-semibold mt-0.5">' + p.nama + '</p>' +
+                        '</div>' +
+                        '<span class="px-2.5 py-1 rounded-full border text-[11px] font-bold ' + statusBadgeColor + '">' + p.status + '</span>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-2 gap-2 text-slate-300 pt-1">' +
+                        '<div><span class="text-slate-500">Sepatu:</span><br><b>' + p.sepatu + '</b></div>' +
+                        '<div><span class="text-slate-500">Estimasi Selesai:</span><br><b class="text-indigo-300">' + (p.tglSelesai || '-') + '</b></div>' +
+                        '<div><span class="text-slate-500">Layanan:</span><br>' + p.layananNama + '</div>' +
+                        '<div><span class="text-slate-500">Total Biaya:</span><br><b class="text-emerald-400">' + formatRp(grandTotal) + '</b> (' + (p.bayar || 'Belum Bayar') + ')</div>' +
+                    '</div>' +
+                    (p.minus ? '<div class="mt-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300"><b>Catatan Kondisi Awal:</b> ' + p.minus + '</div>' : '') +
+                '</div>';
+        }
+
+        // AUTO CHECK DARI LINK URL (Hash #cek=ASH-XXXX)
+        window.addEventListener('load', function() {
+            var hash = window.location.hash;
+            if (hash && hash.startsWith('#cek=')) {
+                var targetId = hash.replace('#cek=', '');
+                bukaModalCekStatus();
+                document.getElementById('input-search-id').value = targetId;
+                tampilkanDetailTracking(targetId);
+            }
+        });
+
         function exportBackupData() {
             var backupData = JSON.stringify(state, null, 2);
             var blob = new Blob([backupData], { type: 'application/json' });
@@ -778,6 +912,7 @@
 
         document.getElementById('formPesanan').addEventListener('submit', function(e) {
             e.preventDefault();
+            var editId = document.getElementById('p-edit-id').value;
             var qtyInputs = document.querySelectorAll('.input-qty-layanan');
             var namaLayananList = [], totalTarif = 0, totalBahan = 0, totalOngkos = 0, totalItemCount = 0;
 
@@ -799,27 +934,54 @@
                 }
             }
 
-            if (totalItemCount === 0) { alert('Masukkan Qty minimal 1!'); return; }
-
             var tglInput = document.getElementById('p-tgl-selesai').value;
             var tglFormatted = tglInput ? new Date(tglInput).toLocaleDateString('id-ID') : '-';
 
-            state.pesanan.push({
-                id: 'ASH-' + Date.now().toString().slice(-6),
-                nama: document.getElementById('p-nama').value,
-                hp: document.getElementById('p-hp').value,
-                sepatu: document.getElementById('p-sepatu').value,
-                minus: document.getElementById('p-minus').value,
-                metode: document.getElementById('p-metode').value,
-                ongkir: parseInt(document.getElementById('p-ongkir').value) || 0,
-                tglSelesai: tglFormatted,
-                layananNama: namaLayananList.join(', '),
-                tarif: totalTarif,
-                bahan: totalBahan,
-                ongkos: totalOngkos,
-                status: 'Antrian',
-                bayar: document.getElementById('p-bayar').value
-            });
+            if (editId) {
+                // EDIT PESANAN EKSISTING
+                for (var idx = 0; idx < state.pesanan.length; idx++) {
+                    if (state.pesanan[idx].id === editId) {
+                        state.pesanan[idx].nama = document.getElementById('p-nama').value;
+                        state.pesanan[idx].hp = document.getElementById('p-hp').value;
+                        state.pesanan[idx].sepatu = document.getElementById('p-sepatu').value;
+                        state.pesanan[idx].minus = document.getElementById('p-minus').value;
+                        state.pesanan[idx].metode = document.getElementById('p-metode').value;
+                        state.pesanan[idx].ongkir = parseInt(document.getElementById('p-ongkir').value) || 0;
+                        state.pesanan[idx].tglSelesai = tglFormatted;
+                        state.pesanan[idx].bayar = document.getElementById('p-bayar').value;
+
+                        // Jika memilih layanan baru saat edit
+                        if (totalItemCount > 0) {
+                            state.pesanan[idx].layananNama = namaLayananList.join(', ');
+                            state.pesanan[idx].tarif = totalTarif;
+                            state.pesanan[idx].bahan = totalBahan;
+                            state.pesanan[idx].ongkos = totalOngkos;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                // TAMBAH PESANAN BARU
+                if (totalItemCount === 0) { alert('Masukkan Qty layanan minimal 1!'); return; }
+
+                state.pesanan.push({
+                    id: 'ASH-' + Date.now().toString().slice(-6),
+                    nama: document.getElementById('p-nama').value,
+                    hp: document.getElementById('p-hp').value,
+                    sepatu: document.getElementById('p-sepatu').value,
+                    minus: document.getElementById('p-minus').value,
+                    metode: document.getElementById('p-metode').value,
+                    ongkir: parseInt(document.getElementById('p-ongkir').value) || 0,
+                    tglSelesai: tglFormatted,
+                    layananNama: namaLayananList.join(', '),
+                    tarif: totalTarif,
+                    bahan: totalBahan,
+                    ongkos: totalOngkos,
+                    status: 'Antrian',
+                    bayar: document.getElementById('p-bayar').value
+                });
+            }
+
             saveData();
             closeModalPesanan();
             e.target.reset();
@@ -893,10 +1055,7 @@
         }
 
         function cetakNota(id) {
-            var p = null;
-            for (var i = 0; i < state.pesanan.length; i++) {
-                if (state.pesanan[i].id === id) { p = state.pesanan[i]; break; }
-            }
+            var p = state.pesanan.find(function(item) { return item.id === id; });
             if (!p) return;
 
             var tanggalOrder = new Date().toLocaleDateString('id-ID');
@@ -996,11 +1155,18 @@
 
         function openModalPesanan() { 
             document.getElementById('modalPesanan').classList.remove('hidden'); 
-            var defaultDate = new Date();
-            defaultDate.setDate(defaultDate.getDate() + 2);
-            document.getElementById('p-tgl-selesai').value = defaultDate.toISOString().slice(0, 10);
+            if (!document.getElementById('p-edit-id').value) {
+                var defaultDate = new Date();
+                defaultDate.setDate(defaultDate.getDate() + 2);
+                document.getElementById('p-tgl-selesai').value = defaultDate.toISOString().slice(0, 10);
+            }
         }
-        function closeModalPesanan() { document.getElementById('modalPesanan').classList.add('hidden'); }
+        function closeModalPesanan() { 
+            document.getElementById('modalPesanan').classList.add('hidden'); 
+            document.getElementById('formPesanan').reset();
+            document.getElementById('p-edit-id').value = '';
+            document.getElementById('modalPesananTitle').innerText = 'Tambah Pesanan Baru';
+        }
         function openModalLayanan() { document.getElementById('modalLayanan').classList.remove('hidden'); }
         function closeModalLayanan() { 
             document.getElementById('modalLayanan').classList.add('hidden'); 
