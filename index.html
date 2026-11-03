@@ -32,7 +32,7 @@
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
-    <!-- SCREEN LOGIN & CEK STATUS PUBLIK -->
+    <!-- SCREEN LOGIN KASIR -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center space-y-6 shadow-2xl">
             <div class="inline-flex bg-indigo-600 p-4 rounded-2xl text-white shadow-xl shadow-indigo-600/30">
@@ -53,17 +53,6 @@
                     <i data-lucide="log-in" class="w-4 h-4"></i> Masuk Sistem Kasir
                 </button>
             </form>
-
-            <div class="relative flex py-1 items-center">
-                <div class="flex-grow border-t border-slate-800"></div>
-                <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-medium">atau Pelanggan?</span>
-                <div class="flex-grow border-t border-slate-800"></div>
-            </div>
-
-            <!-- PUBLIC TRACKING BUTTON -->
-            <button onclick="bukaModalCekStatus()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-300 rounded-xl font-medium text-xs transition-all flex items-center justify-center gap-2">
-                <i data-lucide="search" class="w-4 h-4"></i> Cek Status Cuci Sepatu
-            </button>
 
             <p class="text-[10px] text-slate-600">ALLSHINE PWA Mobile Ready</p>
         </div>
@@ -90,7 +79,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-lg leading-tight text-white">ALL<span class="text-indigo-400">SHINE</span></h1>
-                <p class="text-[11px] text-emerald-400 font-medium">● Kasir Aktif</p>
+                <p class="text-[11px] text-emerald-400 font-medium">● Kasir Aktif (Cloud Sync)</p>
             </div>
         </div>
 
@@ -209,7 +198,7 @@
                         <tr>
                             <th class="p-3">ID</th>
                             <th class="p-3">Pelanggan</th>
-                            <th class="p-3">Sepatu & Catatan</th>
+                            <th class="p-3">Sepatu & Minus</th>
                             <th class="p-3">Layanan & Tgl Selesai</th>
                             <th class="p-3">Total Biaya</th>
                             <th class="p-3">Pengerjaan</th>
@@ -295,30 +284,6 @@
         </section>
 
     </main>
-
-    <!-- MODAL CEK STATUS (PUBLIC / TRACKING) -->
-    <div id="modalCekStatus" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 rounded-3xl border border-slate-800 max-w-md w-full p-6 space-y-5 shadow-2xl relative">
-            <div class="text-center space-y-1">
-                <div class="inline-flex bg-indigo-600/20 text-indigo-400 p-3 rounded-2xl mb-2">
-                    <i data-lucide="package-check" class="w-7 h-7"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white">Cek Status Cuci Sepatu</h3>
-                <p class="text-xs text-slate-400">Masukkan Kode Order unik kamu di bawah ini</p>
-            </div>
-
-            <div class="flex gap-2">
-                <input type="text" id="input-search-id" placeholder="Contoh: ASH-123456" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white tracking-wider focus:outline-none focus:border-indigo-500 uppercase">
-                <button onclick="prosesCekStatusManual()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all">Cek</button>
-            </div>
-
-            <div id="result-status-area" class="hidden bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 space-y-3">
-                <!-- DYNAMIC RESULT HERE -->
-            </div>
-
-            <button onclick="tutupModalCekStatus()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all">Tutup</button>
-        </div>
-    </div>
 
     <!-- MODAL SYNC / PASTE DATA -->
     <div id="modalSync" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -469,6 +434,7 @@
     <!-- SCRIPT -->
     <script>
         var KASIR_PIN = "1234"; 
+        var GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzJP_L1NP66djdjB46_cEARjHAJbZiZIPAGzqnEfDWVcuqcmWCzf-YNGRT0ja6C666P2g/exec";
 
         function handleLogin(e) {
             e.preventDefault();
@@ -624,9 +590,8 @@
                 
                 var grandTotal = p.tarif + (p.ongkir || 0);
                 
-                // LINK TRACKING OTOMATIS
-                var trackingUrl = window.location.origin + window.location.pathname + '#cek=' + p.id;
-                var textWA = 'Halo Kak *' + p.nama + '*,\n\nSepatu kamu (*' + p.sepatu + '*) di *ALLSHINE* statusnya saat ini: *' + p.status + '*.\n\n📅 Estimasi Selesai: *' + (p.tglSelesai || '-') + '*\n💰 Total Biaya: *' + formatRp(grandTotal) + '* (' + currentBayar + ')\n\n🔍 *Cek Progres Sepatu Real-Time di sini:*\n' + trackingUrl + '\n\nTerima kasih telah mencuci sepatu di ALLSHINE!';
+                // WHATSAPP INFORMATIF TANPA LINK EKSTERNAL YANG INVALID
+                var textWA = 'Halo Kak *' + p.nama + '*,\n\nTerima kasih telah mempercayakan perawatan sepatu Anda di *ALLSHINE* 👟✨\n\nBerikut adalah detail pesanan Anda:\n• ID Order: *' + p.id + '*\n• Jenis Sepatu: *' + p.sepatu + '*\n• Layanan: *' + p.layananNama + '*\n• Catatan Minus: *' + (p.minus || '-') + '*\n• Estimasi Selesai: *' + (p.tglSelesai || '-') + '*\n• Status Pengerjaan: *' + p.status + '*\n• Total Biaya: *' + formatRp(grandTotal) + '* (' + currentBayar + ')\n\nKami akan mengabari Anda kembali jika sepatu sudah siap diambil/diantar. Terima kasih!';
                 var urlWA = 'https://api.whatsapp.com/send?phone=' + formatHP(p.hp) + '&text=' + encodeURIComponent(textWA);
 
                 tbody.innerHTML += 
@@ -778,7 +743,6 @@
             }
         }
 
-        // FITUR EDIT & HAPUS PESANAN
         function bukaEditPesanan(id) {
             var p = state.pesanan.find(function(item) { return item.id === id; });
             if (!p) return;
@@ -803,70 +767,6 @@
                 saveData();
             }
         }
-
-        // FITUR PUBLIC CEK STATUS / TRACKING
-        function bukaModalCekStatus() {
-            document.getElementById('modalCekStatus').classList.remove('hidden');
-        }
-        function tutupModalCekStatus() {
-            document.getElementById('modalCekStatus').classList.add('hidden');
-            document.getElementById('result-status-area').classList.add('hidden');
-            document.getElementById('input-search-id').value = '';
-        }
-
-        function prosesCekStatusManual() {
-            var searchId = document.getElementById('input-search-id').value.trim().toUpperCase();
-            if (!searchId) { alert('Masukkan Kode Order!'); return; }
-            tampilkanDetailTracking(searchId);
-        }
-
-        function tampilkanDetailTracking(orderId) {
-            var p = state.pesanan.find(function(item) { return item.id.toUpperCase() === orderId.toUpperCase(); });
-            var resultArea = document.getElementById('result-status-area');
-            resultArea.classList.remove('hidden');
-
-            if (!p) {
-                resultArea.innerHTML = 
-                    '<div class="text-center py-3 text-rose-400 font-semibold text-xs">' +
-                        '❌ Pesanan dengan ID <b>' + orderId + '</b> tidak ditemukan.<br><span class="text-slate-400 font-normal">Pastikan penulisan ID sudah benar.</span>' +
-                    '</div>';
-                return;
-            }
-
-            var grandTotal = p.tarif + (p.ongkir || 0);
-            var statusBadgeColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
-            if (p.status === 'Proses Cuci') statusBadgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-            if (p.status === 'Selesai') statusBadgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
-
-            resultArea.innerHTML = 
-                '<div class="space-y-2 text-xs">' +
-                    '<div class="flex justify-between items-center pb-2 border-b border-slate-700/80">' +
-                        '<div>' +
-                            '<span class="font-mono font-bold text-indigo-400 text-sm">' + p.id + '</span>' +
-                            '<p class="text-[11px] text-slate-300 font-semibold mt-0.5">' + p.nama + '</p>' +
-                        '</div>' +
-                        '<span class="px-2.5 py-1 rounded-full border text-[11px] font-bold ' + statusBadgeColor + '">' + p.status + '</span>' +
-                    '</div>' +
-                    '<div class="grid grid-cols-2 gap-2 text-slate-300 pt-1">' +
-                        '<div><span class="text-slate-500">Sepatu:</span><br><b>' + p.sepatu + '</b></div>' +
-                        '<div><span class="text-slate-500">Estimasi Selesai:</span><br><b class="text-indigo-300">' + (p.tglSelesai || '-') + '</b></div>' +
-                        '<div><span class="text-slate-500">Layanan:</span><br>' + p.layananNama + '</div>' +
-                        '<div><span class="text-slate-500">Total Biaya:</span><br><b class="text-emerald-400">' + formatRp(grandTotal) + '</b> (' + (p.bayar || 'Belum Bayar') + ')</div>' +
-                    '</div>' +
-                    (p.minus ? '<div class="mt-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300"><b>Catatan Kondisi Awal:</b> ' + p.minus + '</div>' : '') +
-                '</div>';
-        }
-
-        // AUTO CHECK DARI LINK URL (Hash #cek=ASH-XXXX)
-        window.addEventListener('load', function() {
-            var hash = window.location.hash;
-            if (hash && hash.startsWith('#cek=')) {
-                var targetId = hash.replace('#cek=', '');
-                bukaModalCekStatus();
-                document.getElementById('input-search-id').value = targetId;
-                tampilkanDetailTracking(targetId);
-            }
-        });
 
         function exportBackupData() {
             var backupData = JSON.stringify(state, null, 2);
@@ -910,6 +810,32 @@
             }
         }
 
+        // FUNGSI KIRIM DATA KE GOOGLE SHEETS CLOUD
+        function kirimKeGoogleSheets(orderObj) {
+            if (!GOOGLE_SHEETS_URL) return;
+            var payload = {
+                id: orderObj.id,
+                tanggal: new Date().toLocaleDateString('id-ID'),
+                nama: orderObj.nama,
+                hp: orderObj.hp,
+                sepatu: orderObj.sepatu,
+                layanan: orderObj.layananNama,
+                total: orderObj.tarif + (orderObj.ongkir || 0),
+                status: orderObj.status
+            };
+
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(function() {
+                console.log('Data berhasil disinkronkan ke Cloud Google Sheets!');
+            }).catch(function(err) {
+                console.error('Gagal sync ke cloud:', err);
+            });
+        }
+
         document.getElementById('formPesanan').addEventListener('submit', function(e) {
             e.preventDefault();
             var editId = document.getElementById('p-edit-id').value;
@@ -938,7 +864,6 @@
             var tglFormatted = tglInput ? new Date(tglInput).toLocaleDateString('id-ID') : '-';
 
             if (editId) {
-                // EDIT PESANAN EKSISTING
                 for (var idx = 0; idx < state.pesanan.length; idx++) {
                     if (state.pesanan[idx].id === editId) {
                         state.pesanan[idx].nama = document.getElementById('p-nama').value;
@@ -950,7 +875,6 @@
                         state.pesanan[idx].tglSelesai = tglFormatted;
                         state.pesanan[idx].bayar = document.getElementById('p-bayar').value;
 
-                        // Jika memilih layanan baru saat edit
                         if (totalItemCount > 0) {
                             state.pesanan[idx].layananNama = namaLayananList.join(', ');
                             state.pesanan[idx].tarif = totalTarif;
@@ -961,10 +885,9 @@
                     }
                 }
             } else {
-                // TAMBAH PESANAN BARU
                 if (totalItemCount === 0) { alert('Masukkan Qty layanan minimal 1!'); return; }
 
-                state.pesanan.push({
+                var newOrder = {
                     id: 'ASH-' + Date.now().toString().slice(-6),
                     nama: document.getElementById('p-nama').value,
                     hp: document.getElementById('p-hp').value,
@@ -979,7 +902,12 @@
                     ongkos: totalOngkos,
                     status: 'Antrian',
                     bayar: document.getElementById('p-bayar').value
-                });
+                };
+
+                state.pesanan.push(newOrder);
+                
+                // Kirim otomatis ke Google Sheets Cloud
+                kirimKeGoogleSheets(newOrder);
             }
 
             saveData();
